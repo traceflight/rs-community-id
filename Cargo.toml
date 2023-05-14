@@ -2,6 +2,12 @@
 name = "community-id"
 version = "0.1.0"
 edition = "2021"
+authors = ["Julian Wang <traceflight@outlook.com>"]
+readme = "README.md"
+keywords = ["community-id", "flow"]
+repository = "https://github.com/traceflight/rs-community-id"
+categories = ["network-programming"]
+license = "MIT OR Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
