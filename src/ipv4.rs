@@ -45,7 +45,7 @@ pub fn calculate_ipv4_community_id(
         std::mem::swap(&mut sport, &mut dport);
     }
 
-    if src_port.is_some() && dst_port.is_some() {
+    let hash = if src_port.is_some() && dst_port.is_some() {
         let ipv4 = Ipv4Data {
             seed: seed.to_be(),
             src_ip: sip,
@@ -55,11 +55,7 @@ pub fn calculate_ipv4_community_id(
             src_port: sport.unwrap(),
             dst_port: dport.unwrap(),
         };
-        let hash = Sha1::new().chain(ipv4).finalize();
-        match disable_base64 {
-            false => Ok("1:".to_string() + &BASE64_STANDARD.encode(hash)),
-            true => Ok("1:".to_string() + &hex::encode(hash)),
-        }
+        Sha1::new().chain(ipv4).finalize()
     } else {
         let ipv4 = Ipv4DataWithoutPort {
             seed: seed.to_be(),
@@ -68,11 +64,12 @@ pub fn calculate_ipv4_community_id(
             proto: ip_proto as u8,
             pad0: PADDING,
         };
-        let hash = Sha1::new().chain(ipv4).finalize();
-        match disable_base64 {
-            false => Ok("1:".to_string() + &BASE64_STANDARD.encode(hash)),
-            true => Ok("1:".to_string() + &hex::encode(hash)),
-        }
+        Sha1::new().chain(ipv4).finalize()
+    };
+
+    match disable_base64 {
+        false => Ok("1:".to_string() + &BASE64_STANDARD.encode(hash)),
+        true => Ok("1:".to_string() + &hex::encode(hash)),
     }
 }
 
