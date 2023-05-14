@@ -48,3 +48,24 @@ pub fn calculate_community_id(
         _ => return Err(anyhow!("src ip and dst ip should be same version!")),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::net::Ipv4Addr;
+
+    use super::*;
+
+    #[test]
+    fn test_calc() {
+        let id = calculate_community_id(
+            0,
+            Ipv4Addr::new(1, 2, 3, 4).into(),
+            Ipv4Addr::new(5, 6, 7, 8).into(),
+            Some(1122),
+            Some(3344),
+            6,
+            Default::default(),
+        );
+        assert_eq!("1:wCb3OG7yAFWelaUydu0D+125CLM=", id.unwrap());
+    }
+}
