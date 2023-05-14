@@ -9,10 +9,13 @@ lazy_static! {
         (IcmpType::Echo, IcmpType::EchoReply),
         (IcmpType::EchoReply, IcmpType::Echo),
         (IcmpType::Tstamp, IcmpType::TstampReply),
-        (IcmpType::Info, IcmpType::InfoReplay),
+        (IcmpType::TstampReply, IcmpType::Tstamp),
+        (IcmpType::Info, IcmpType::InfoReply),
+        (IcmpType::InfoReply, IcmpType::Info),
         (IcmpType::RtrSolicit, IcmpType::RtrAdvert),
         (IcmpType::RtrAdvert, IcmpType::RtrSolicit),
-        (IcmpType::Mask, IcmpType::MaskReply)
+        (IcmpType::Mask, IcmpType::MaskReply),
+        (IcmpType::MaskReply, IcmpType::Mask)
     ]);
 }
 
@@ -27,7 +30,7 @@ enum IcmpType {
     Tstamp = 13,
     TstampReply = 14,
     Info = 15,
-    InfoReplay = 16,
+    InfoReply = 16,
     Mask = 17,
     MaskReply = 18,
 }
