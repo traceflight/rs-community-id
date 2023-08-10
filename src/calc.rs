@@ -12,10 +12,10 @@ pub fn calculate_community_id(
     dst_ip: IpAddr,
     src_port: Option<u16>,
     dst_port: Option<u16>,
-    ip_proto: i32,
+    ip_proto: u8,
     disable_base64: bool,
 ) -> Result<String> {
-    match ip_proto {
+    match ip_proto as i32 {
         IPPROTO_ICMP | IPPROTO_ICMPV6 | IPPROTO_TCP | IPPROTO_UDP | IPPROTO_SCTP => {
             if src_port.is_none() || dst_port.is_none() {
                 return Err(anyhow!(
@@ -67,5 +67,20 @@ mod tests {
             Default::default(),
         );
         assert_eq!("1:wCb3OG7yAFWelaUydu0D+125CLM=", id.unwrap());
+    }
+
+    #[test]
+    fn test_tcp_without_ports() {
+        let id = calculate_community_id(
+            0,
+            Ipv4Addr::new(1, 2, 3, 4).into(),
+            Ipv4Addr::new(5, 6, 7, 8).into(),
+            None,
+            None,
+            6,
+            Default::default(),
+        );
+        assert!(id.is_err());
+        assert_eq!("src port and dst port should be set when protocol is icmp/icmp6/tcp/udp/sctp", id.err().unwrap().to_string());
     }
 }

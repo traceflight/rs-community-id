@@ -14,7 +14,7 @@ pub fn calculate_ipv6_community_id(
     dst_ip: Ipv6Addr,
     src_port: Option<u16>,
     dst_port: Option<u16>,
-    ip_proto: i32,
+    ip_proto: u8,
     disable_base64: bool,
 ) -> Result<String> {
     let mut sip = src_ip.octets();
@@ -28,7 +28,7 @@ pub fn calculate_ipv6_community_id(
     if src_port.is_some() && dst_port.is_some() {
         let tmp_src_port = src_port.unwrap();
         let tmp_dst_port = dst_port.unwrap();
-        match ip_proto {
+        match ip_proto as i32 {
             IPPROTO_ICMPV6 => {
                 let (src, dst, one_way) = icmpv6::get_port_equivalents(tmp_src_port, tmp_dst_port);
                 is_one_way = one_way;
@@ -50,7 +50,7 @@ pub fn calculate_ipv6_community_id(
             seed: seed.to_be(),
             src_ip: sip,
             dst_ip: dip,
-            proto: ip_proto as u8,
+            proto: ip_proto,
             pad0: PADDING,
             src_port: sport.unwrap(),
             dst_port: dport.unwrap(),
@@ -61,7 +61,7 @@ pub fn calculate_ipv6_community_id(
             seed: seed.to_be(),
             src_ip: sip,
             dst_ip: dip,
-            proto: ip_proto as u8,
+            proto: ip_proto,
             pad0: PADDING,
         };
         Sha1::new().chain(ipv6).finalize()
