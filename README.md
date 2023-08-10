@@ -11,7 +11,7 @@ This package provides a Rust implementation of the open [Community ID](https://g
 ```toml
 # Cargo.toml
 [dependencies]
-community-id = "0.1"
+community-id = "0.2"
 ```
 
 ```rust
