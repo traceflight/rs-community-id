@@ -14,7 +14,6 @@ license = "MIT OR Apache-2.0"
 
 [dependencies]
 anyhow = "1.0.71"
-libc = "0.2"
 lazy_static = "1.4.0"
 sha1 = "0.10.5"
 base64 = "0.21.0"

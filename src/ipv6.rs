@@ -2,11 +2,10 @@ use std::net::Ipv6Addr;
 
 use anyhow::{anyhow, Result};
 use base64::prelude::*;
-use libc::{IPPROTO_ICMP, IPPROTO_ICMPV6};
 use sha1::digest::Update;
 use sha1::{Digest, Sha1};
 
-use crate::{icmpv6, PADDING};
+use crate::{icmpv6, PADDING, IPPROTO_ICMP,IPPROTO_ICMPV6};
 
 pub fn calculate_ipv6_community_id(
     seed: u16,
@@ -28,7 +27,7 @@ pub fn calculate_ipv6_community_id(
     if src_port.is_some() && dst_port.is_some() {
         let tmp_src_port = src_port.unwrap();
         let tmp_dst_port = dst_port.unwrap();
-        match ip_proto as i32 {
+        match ip_proto {
             IPPROTO_ICMPV6 => {
                 let (src, dst, one_way) = icmpv6::get_port_equivalents(tmp_src_port, tmp_dst_port);
                 is_one_way = one_way;
