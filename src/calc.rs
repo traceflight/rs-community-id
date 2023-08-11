@@ -2,9 +2,7 @@ use std::net::IpAddr;
 
 use anyhow::{anyhow, Result};
 
-use libc::{IPPROTO_ICMP, IPPROTO_ICMPV6, IPPROTO_SCTP, IPPROTO_TCP, IPPROTO_UDP};
-
-use crate::{ipv4, ipv6};
+use crate::{ipv4, ipv6, IPPROTO_ICMP, IPPROTO_ICMPV6, IPPROTO_SCTP, IPPROTO_TCP, IPPROTO_UDP};
 
 pub fn calculate_community_id(
     seed: u16,
@@ -15,7 +13,7 @@ pub fn calculate_community_id(
     ip_proto: u8,
     disable_base64: bool,
 ) -> Result<String> {
-    match ip_proto as i32 {
+    match ip_proto {
         IPPROTO_ICMP | IPPROTO_ICMPV6 | IPPROTO_TCP | IPPROTO_UDP | IPPROTO_SCTP => {
             if src_port.is_none() || dst_port.is_none() {
                 return Err(anyhow!(
