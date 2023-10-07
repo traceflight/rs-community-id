@@ -32,7 +32,7 @@ assert_eq!("1:wCb3OG7yAFWelaUydu0D+125CLM=", id.unwrap());
 ```
 
 
-# License
+## License
 
 This project is licensed under either of
 

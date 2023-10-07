@@ -1,9 +1,11 @@
+#![allow(non_upper_case_globals)]
+
 use std::collections::HashMap;
 
 use lazy_static::lazy_static;
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 
-// 参考 https://github.com/corelight/pycommunityid/blob/master/communityid/icmp.py
+// https://github.com/corelight/pycommunityid/blob/master/communityid/icmp.py
 lazy_static! {
     static ref ICMP_TYPE_MAPPING: HashMap<IcmpType, IcmpType> = HashMap::from([
         (IcmpType::Echo, IcmpType::EchoReply),
@@ -19,7 +21,7 @@ lazy_static! {
     ]);
 }
 
-// 参考 https://github.com/corelight/pycommunityid/blob/master/communityid/icmp.py
+// https://github.com/corelight/pycommunityid/blob/master/communityid/icmp.py
 #[repr(u16)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, TryFromPrimitive, IntoPrimitive)]
 enum IcmpType {
