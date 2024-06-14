@@ -11,16 +11,13 @@ pub fn calculate_ipv4_community_id(
     seed: u16,
     src_ip: Ipv4Addr,
     dst_ip: Ipv4Addr,
-    src_port: Option<u16>,
-    dst_port: Option<u16>,
+    mut src_port: Option<u16>,
+    mut dst_port: Option<u16>,
     ip_proto: u8,
     disable_base64: bool,
 ) -> Result<String> {
     let mut sip = <Ipv4Addr as Into<u32>>::into(src_ip).to_be();
     let mut dip = <Ipv4Addr as Into<u32>>::into(dst_ip).to_be();
-
-    let mut sport = src_port.map(|p| p.to_be());
-    let mut dport = dst_port.map(|p| p.to_be());
 
     let mut is_one_way = false;
 
@@ -31,14 +28,17 @@ pub fn calculate_ipv4_community_id(
 
             let (src, dst, one_way) = icmpv4::get_port_equivalents(tmp_src_port, tmp_dst_port);
             is_one_way = one_way;
-            sport = Some(src.to_be());
-            dport = Some(dst.to_be());
+            src_port = Some(src);
+            dst_port = Some(dst);
         }
         IPPROTO_ICMPV6 => return Err(anyhow!("icmpv6 can not over ipv4!")),
         _ => {}
     }
 
-    if !(is_one_way || src_ip < dst_ip || (src_ip == dst_ip && sport < dport)) {
+    let mut sport = src_port.map(|p| p.to_be());
+    let mut dport = dst_port.map(|p| p.to_be());
+
+    if !(is_one_way || src_ip < dst_ip || (src_ip == dst_ip && src_port < dst_port)) {
         std::mem::swap(&mut sip, &mut dip);
         std::mem::swap(&mut sport, &mut dport);
     }
@@ -139,6 +139,10 @@ mod tests {
     }
     fn test_baseline_ipv4_default_data() -> Vec<(Ipv4Input, String)> {
         let raw = vec![
+            (
+                (0, "0.0.0.0", "0.0.0.0", Some(23376), Some(443), 6),
+                "1:EWt4TLjkII9rdzFzQrCecjyvdNs=",
+            ),
             (
                 (0, "1.2.3.4", "5.6.7.8", Some(1122), Some(3344), 6),
                 "1:wCb3OG7yAFWelaUydu0D+125CLM=",
