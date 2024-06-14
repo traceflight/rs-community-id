@@ -11,16 +11,13 @@ pub fn calculate_ipv6_community_id(
     seed: u16,
     src_ip: Ipv6Addr,
     dst_ip: Ipv6Addr,
-    src_port: Option<u16>,
-    dst_port: Option<u16>,
+    mut src_port: Option<u16>,
+    mut dst_port: Option<u16>,
     ip_proto: u8,
     disable_base64: bool,
 ) -> Result<String> {
     let mut sip = src_ip.octets();
     let mut dip = dst_ip.octets();
-
-    let mut sport = src_port.map(|p| p.to_be());
-    let mut dport = dst_port.map(|p| p.to_be());
 
     let mut is_one_way = false;
 
@@ -30,19 +27,22 @@ pub fn calculate_ipv6_community_id(
         IPPROTO_ICMP => {
             let (src, dst, one_way) = icmpv4::get_port_equivalents(tmp_src_port, tmp_dst_port);
             is_one_way = one_way;
-            sport = Some(src.to_be());
-            dport = Some(dst.to_be());
+            src_port = Some(src);
+            dst_port = Some(dst);
         }
         IPPROTO_ICMPV6 => {
             let (src, dst, one_way) = icmpv6::get_port_equivalents(tmp_src_port, tmp_dst_port);
             is_one_way = one_way;
-            sport = Some(src.to_be());
-            dport = Some(dst.to_be());
+            src_port = Some(src);
+            dst_port = Some(dst);
         }
         _ => {}
     }
 
-    if !(is_one_way || src_ip < dst_ip || (src_ip == dst_ip && sport < dport)) {
+    let mut sport = src_port.map(|p| p.to_be());
+    let mut dport = dst_port.map(|p| p.to_be());
+
+    if !(is_one_way || src_ip < dst_ip || (src_ip == dst_ip && src_port < dst_port)) {
         std::mem::swap(&mut sip, &mut dip);
         std::mem::swap(&mut sport, &mut dport);
     }
