@@ -24,10 +24,11 @@ pub fn calculate_ipv4_community_id(
 
     let mut is_one_way = false;
 
-    let tmp_src_port = src_port.unwrap_or_default();
-    let tmp_dst_port = dst_port.unwrap_or_default();
     match ip_proto {
         IPPROTO_ICMP => {
+            let tmp_src_port = src_port.unwrap_or_default();
+            let tmp_dst_port = dst_port.unwrap_or_default();
+
             let (src, dst, one_way) = icmpv4::get_port_equivalents(tmp_src_port, tmp_dst_port);
             is_one_way = one_way;
             sport = Some(src.to_be());
@@ -181,6 +182,10 @@ mod tests {
             (
                 (0, "5.6.7.8", "1.2.3.4", None, None, 46),
                 "1:ikv3kmf89luf73WPz1jOs49S768=",
+            ),
+            (
+                (0, "100.66.124.24", "172.31.98.44", None, None, 47),
+                "1:Uo11LCySQ1S0c9jtHZVIb4Pm/2k=",
             ),
         ];
         raw.into_iter()
