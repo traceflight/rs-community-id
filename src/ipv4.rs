@@ -5,7 +5,7 @@ use base64::prelude::*;
 use sha1::digest::Update;
 use sha1::{Digest, Sha1};
 
-use crate::{icmpv4, PADDING, IPPROTO_ICMP, IPPROTO_ICMPV6};
+use crate::{icmpv4, IPPROTO_ICMP, IPPROTO_ICMPV6, PADDING};
 
 pub fn calculate_ipv4_community_id(
     seed: u16,
@@ -24,27 +24,25 @@ pub fn calculate_ipv4_community_id(
 
     let mut is_one_way = false;
 
-    if src_port.is_some() && dst_port.is_some() {
-        let tmp_src_port = src_port.unwrap();
-        let tmp_dst_port = dst_port.unwrap();
-        match ip_proto {
-            IPPROTO_ICMP => {
-                let (src, dst, one_way) = icmpv4::get_port_equivalents(tmp_src_port, tmp_dst_port);
-                is_one_way = one_way;
-                sport = Some(src.to_be());
-                dport = Some(dst.to_be());
-            }
-            IPPROTO_ICMPV6 => return Err(anyhow!("icmpv6 can not over ipv4!")),
-            _ => {}
+    let tmp_src_port = src_port.unwrap_or_default();
+    let tmp_dst_port = dst_port.unwrap_or_default();
+    match ip_proto {
+        IPPROTO_ICMP => {
+            let (src, dst, one_way) = icmpv4::get_port_equivalents(tmp_src_port, tmp_dst_port);
+            is_one_way = one_way;
+            sport = Some(src.to_be());
+            dport = Some(dst.to_be());
         }
+        IPPROTO_ICMPV6 => return Err(anyhow!("icmpv6 can not over ipv4!")),
+        _ => {}
     }
 
-    if !(is_one_way || src_ip < dst_ip || (src_ip == dst_ip && src_port < dst_port)) {
+    if !(is_one_way || src_ip < dst_ip || (src_ip == dst_ip && sport < dport)) {
         std::mem::swap(&mut sip, &mut dip);
         std::mem::swap(&mut sport, &mut dport);
     }
 
-    let hash = if src_port.is_some() && dst_port.is_some() {
+    let hash = if sport.is_some() && dport.is_some() {
         let ipv4 = Ipv4Data {
             seed: seed.to_be(),
             src_ip: sip,
