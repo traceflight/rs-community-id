@@ -11,8 +11,8 @@ pub fn calculate_ipv6_community_id(
     seed: u16,
     src_ip: Ipv6Addr,
     dst_ip: Ipv6Addr,
-    mut src_port: Option<u16>,
-    mut dst_port: Option<u16>,
+    src_port: Option<u16>,
+    dst_port: Option<u16>,
     ip_proto: u8,
     disable_base64: bool,
 ) -> Result<String> {
@@ -21,31 +21,37 @@ pub fn calculate_ipv6_community_id(
 
     let mut is_one_way = false;
 
-    let tmp_src_port = src_port.unwrap_or_default();
-    let tmp_dst_port = dst_port.unwrap_or_default();
+    let mut sport = src_port;
+    let mut dport = dst_port;
     match ip_proto {
         IPPROTO_ICMP => {
-            let (src, dst, one_way) = icmpv4::get_port_equivalents(tmp_src_port, tmp_dst_port);
+            let (src, dst, one_way) = icmpv4::get_port_equivalents(
+                src_port.unwrap_or_default(),
+                dst_port.unwrap_or_default(),
+            );
             is_one_way = one_way;
-            src_port = Some(src);
-            dst_port = Some(dst);
+            sport = Some(src);
+            dport = Some(dst);
         }
         IPPROTO_ICMPV6 => {
-            let (src, dst, one_way) = icmpv6::get_port_equivalents(tmp_src_port, tmp_dst_port);
+            let (src, dst, one_way) = icmpv6::get_port_equivalents(
+                src_port.unwrap_or_default(),
+                dst_port.unwrap_or_default(),
+            );
             is_one_way = one_way;
-            src_port = Some(src);
-            dst_port = Some(dst);
+            sport = Some(src);
+            dport = Some(dst);
         }
         _ => {}
     }
 
-    let mut sport = src_port.map(|p| p.to_be());
-    let mut dport = dst_port.map(|p| p.to_be());
-
-    if !(is_one_way || src_ip < dst_ip || (src_ip == dst_ip && src_port < dst_port)) {
+    if !(is_one_way || src_ip < dst_ip || (src_ip == dst_ip && sport < dport)) {
         std::mem::swap(&mut sip, &mut dip);
         std::mem::swap(&mut sport, &mut dport);
     }
+
+    sport = sport.map(|p| p.to_be());
+    dport = dport.map(|p| p.to_be());
 
     let hash = if sport.is_some() && dport.is_some() {
         let ipv6 = Ipv6Data {
