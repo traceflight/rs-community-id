@@ -1,6 +1,6 @@
 use std::net::Ipv6Addr;
 
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use base64::prelude::*;
 use sha1::digest::Update;
 use sha1::{Digest, Sha1};

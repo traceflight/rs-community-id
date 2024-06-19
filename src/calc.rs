@@ -2,7 +2,7 @@ use std::net::IpAddr;
 
 use anyhow::{anyhow, Result};
 
-use crate::{ipv4, ipv6, IPPROTO_ICMP, IPPROTO_ICMPV6, IPPROTO_SCTP, IPPROTO_TCP, IPPROTO_UDP};
+use crate::{ipv4, ipv6, IPPROTO_SCTP, IPPROTO_TCP, IPPROTO_UDP};
 
 /// Main function to calculate community id.
 ///
