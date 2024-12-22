@@ -45,7 +45,7 @@ const PADDING: u8 = 0;
 /// IP Protocol Number of ICMP
 const IPPROTO_ICMP: u8 = 1;
 
-/// IP Protocol Number or ICMPv6
+/// IP Protocol Number of ICMPv6
 const IPPROTO_ICMPV6: u8 = 58;
 
 /// IP Protocol Number of SCTP
