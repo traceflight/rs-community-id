@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::lazy::LazyLock;
+use std::sync::LazyLock;
 
 const ECHO_REQUEST: u16 = 128;
 const ECHO_REPLY: u16 = 129;
