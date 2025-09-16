@@ -1,6 +1,5 @@
 use std::net::Ipv4Addr;
 
-use anyhow::{anyhow, Result};
 use base64::prelude::*;
 use sha1::digest::Update;
 use sha1::{Digest, Sha1};
@@ -15,7 +14,7 @@ pub fn calculate_ipv4_community_id(
     dst_port: Option<u16>,
     ip_proto: u8,
     disable_base64: bool,
-) -> Result<String> {
+) -> Result<String, &'static str> {
     let mut sip = <Ipv4Addr as Into<u32>>::into(src_ip).to_be();
     let mut dip = <Ipv4Addr as Into<u32>>::into(dst_ip).to_be();
 
@@ -34,7 +33,7 @@ pub fn calculate_ipv4_community_id(
             sport = Some(src);
             dport = Some(dst);
         }
-        IPPROTO_ICMPV6 => return Err(anyhow!("icmpv6 can not over ipv4!")),
+        IPPROTO_ICMPV6 => return Err("icmpv6 can not over ipv4!"),
         _ => {}
     }
 
