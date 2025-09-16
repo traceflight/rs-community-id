@@ -1,6 +1,5 @@
 use std::net::Ipv6Addr;
 
-use anyhow::Result;
 use base64::prelude::*;
 use sha1::digest::Update;
 use sha1::{Digest, Sha1};
@@ -15,7 +14,7 @@ pub fn calculate_ipv6_community_id(
     dst_port: Option<u16>,
     ip_proto: u8,
     disable_base64: bool,
-) -> Result<String> {
+) -> Result<String, &'static str> {
     let mut sip = src_ip.octets();
     let mut dip = dst_ip.octets();
 
