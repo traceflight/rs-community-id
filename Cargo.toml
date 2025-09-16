@@ -15,5 +15,5 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 base64 = "0.22.1"
 hex = "0.4.3"
-phf = "0.13.1"
+phf = { version = "0.13.1", features = ["macros"] }
 sha1 = "0.10.5"
