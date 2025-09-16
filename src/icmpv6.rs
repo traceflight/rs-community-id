@@ -32,7 +32,7 @@ static ICMP_TYPE_MAPPING: phf::Map<u16, u16> = phf_map! {
 };
 
 pub(crate) fn get_port_equivalents(mtype: u16, mcode: u16) -> (u16, u16, bool) {
-    match ICMP_TYPE_MAPPING::get(&mtype) {
+    match ICMP_TYPE_MAPPING.get(&mtype) {
         Ok(v) => (mtype, *v, false),
         Err(_) => (mtype, mcode, true),
     }
