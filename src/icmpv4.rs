@@ -1,4 +1,5 @@
-use phf::phf_map;
+use std::collections::HashMap;
+use std::lazy::LazyLock;
 
 const ECHO_REPLY: u16 = 0;
 const ECHO: u16 = 8;
@@ -12,18 +13,18 @@ const MASK: u16 = 17;
 const MASK_REPLY: u16 = 18;
 
 // https://github.com/corelight/pycommunityid/blob/master/communityid/icmp.py
-static ICMP_TYPE_MAPPING: phf::Map<u16, u16> = phf_map! {
-    ECHO => ECHO_REPLY,
-    ECHO_REPLY => ECHO,
-    TSTAMP => TSTAMP_REPLY,
-    TSTAMP_REPLY => TSTAMP,
-    INFO => INFO_REPLY,
-    INFO_REPLY => INFO,
-    RTR_SOLICIT => RTR_ADVERT,
-    RTR_ADVERT => RTR_SOLICIT,
-    MASK => MASK_REPLY,
-    MASK_REPLY => MASK,
-};
+static ICMP_TYPE_MAPPING: LazyLock<HashMap<u16, u16>> = LazyLock::new(||HashMap::from([
+    (ECHO, ECHO_REPLY),
+    (ECHO_REPLY, ECHO),
+    (TSTAMP, TSTAMP_REPLY),
+    (TSTAMP_REPLY, TSTAMP),
+    (INFO, INFO_REPLY),
+    (INFO_REPLY, INFO),
+    (RTR_SOLICIT, RTR_ADVERT),
+    (RTR_ADVERT, RTR_SOLICIT),
+    (MASK, MASK_REPLY),
+    (MASK_REPLY, MASK),
+]));
 
 pub(crate) fn get_port_equivalents(mtype: u16, mcode: u16) -> (u16, u16, bool) {
     match ICMP_TYPE_MAPPING.get(&mtype) {
