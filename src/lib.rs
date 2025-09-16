@@ -33,6 +33,8 @@
 //! assert_eq!("1:wCb3OG7yAFWelaUydu0D+125CLM=", id.unwrap());
 //! ```
 
+#![no_std]
+
 mod calc;
 mod icmpv4;
 mod icmpv6;
