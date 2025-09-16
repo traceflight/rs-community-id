@@ -1,49 +1,35 @@
-#![allow(non_upper_case_globals)]
-
 use std::collections::HashMap;
+use std::sync::LazyLock;
 
-use lazy_static::lazy_static;
-use num_enum::{IntoPrimitive, TryFromPrimitive};
-
-// https://github.com/corelight/pycommunityid/blob/master/communityid/icmp.py
-lazy_static! {
-    static ref ICMP_TYPE_MAPPING: HashMap<IcmpType, IcmpType> = HashMap::from([
-        (IcmpType::Echo, IcmpType::EchoReply),
-        (IcmpType::EchoReply, IcmpType::Echo),
-        (IcmpType::Tstamp, IcmpType::TstampReply),
-        (IcmpType::TstampReply, IcmpType::Tstamp),
-        (IcmpType::Info, IcmpType::InfoReply),
-        (IcmpType::InfoReply, IcmpType::Info),
-        (IcmpType::RtrSolicit, IcmpType::RtrAdvert),
-        (IcmpType::RtrAdvert, IcmpType::RtrSolicit),
-        (IcmpType::Mask, IcmpType::MaskReply),
-        (IcmpType::MaskReply, IcmpType::Mask)
-    ]);
-}
+const ECHO_REPLY: u16 = 0;
+const ECHO: u16 = 8;
+const RTR_ADVERT: u16 = 9;
+const RTR_SOLICIT: u16 = 10;
+const TSTAMP: u16 = 13;
+const TSTAMP_REPLY: u16 = 14;
+const INFO: u16 = 15;
+const INFO_REPLY: u16 = 16;
+const MASK: u16 = 17;
+const MASK_REPLY: u16 = 18;
 
 // https://github.com/corelight/pycommunityid/blob/master/communityid/icmp.py
-#[repr(u16)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, TryFromPrimitive, IntoPrimitive)]
-enum IcmpType {
-    EchoReply = 0,
-    Echo = 8,
-    RtrAdvert = 9,
-    RtrSolicit = 10,
-    Tstamp = 13,
-    TstampReply = 14,
-    Info = 15,
-    InfoReply = 16,
-    Mask = 17,
-    MaskReply = 18,
-}
+static ICMP_TYPE_MAPPING: LazyLock<HashMap<u16, u16>> = LazyLock::new(||HashMap::from([
+    (ECHO, ECHO_REPLY),
+    (ECHO_REPLY, ECHO),
+    (TSTAMP, TSTAMP_REPLY),
+    (TSTAMP_REPLY, TSTAMP),
+    (INFO, INFO_REPLY),
+    (INFO_REPLY, INFO),
+    (RTR_SOLICIT, RTR_ADVERT),
+    (RTR_ADVERT, RTR_SOLICIT),
+    (MASK, MASK_REPLY),
+    (MASK_REPLY, MASK),
+]));
 
 pub(crate) fn get_port_equivalents(mtype: u16, mcode: u16) -> (u16, u16, bool) {
-    match IcmpType::try_from(mtype) {
-        Ok(mtype_obj) => match ICMP_TYPE_MAPPING.get(&mtype_obj) {
-            Some(v) => return (mtype, (*v).into(), false),
-            None => return (mtype, mcode, true),
-        },
-        Err(_) => return (mtype, mcode, true),
+    match ICMP_TYPE_MAPPING.get(&mtype) {
+        Some(v) => (mtype, *v, false),
+        None => (mtype, mcode, true),
     }
 }
 

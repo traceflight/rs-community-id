@@ -1,52 +1,38 @@
-#![allow(non_upper_case_globals)]
-
 use std::collections::HashMap;
+use std::sync::LazyLock;
 
-use lazy_static::lazy_static;
-use num_enum::{IntoPrimitive, TryFromPrimitive};
-
-// https://github.com/corelight/pycommunityid/blob/master/communityid/icmp6.py
-lazy_static! {
-    static ref ICMP_TYPE_MAPPING: HashMap<IcmpType, IcmpType> = HashMap::from([
-        (IcmpType::EchoRequest, IcmpType::EchoReply),
-        (IcmpType::EchoReply, IcmpType::EchoRequest),
-        (IcmpType::MldListenerQuery, IcmpType::MldListenerReport),
-        (IcmpType::MldListenerReport, IcmpType::MldListenerQuery),
-        (IcmpType::NdRouterSolicit, IcmpType::NdRouterAdvert),
-        (IcmpType::NdRouterAdvert, IcmpType::NdRouterSolicit),
-        (IcmpType::NdNeighborSolicit, IcmpType::NdNeighborAdvert),
-        (IcmpType::NdNeighborAdvert, IcmpType::NdNeighborSolicit),
-        (IcmpType::WruRequest, IcmpType::WruReply),
-        (IcmpType::WruReply, IcmpType::WruRequest),
-        (IcmpType::HaadRequest, IcmpType::HaadReply),
-        (IcmpType::HaadReply, IcmpType::HaadRequest),
-    ]);
-}
+const ECHO_REQUEST: u16 = 128;
+const ECHO_REPLY: u16 = 129;
+const MLD_LISTENER_QUERY: u16 = 130;
+const MLD_LISTENER_REPORT: u16 = 131;
+const ND_ROUTER_SOLICIT: u16 = 133;
+const ND_ROUTER_ADVERT: u16 = 134;
+const ND_NEIGHBOR_SOLICIT: u16 = 135;
+const ND_NEIGHBOR_ADVERT: u16 = 136;
+const WRU_REQUEST: u16 = 139;
+const WRU_REPLY: u16 = 140;
+const HAAD_REQUEST: u16 = 144;
+const HAAD_REPLY: u16 = 145;
 
 // https://github.com/corelight/pycommunityid/blob/master/communityid/icmp6.py
-#[repr(u16)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, TryFromPrimitive, IntoPrimitive)]
-enum IcmpType {
-    EchoRequest = 128,
-    EchoReply = 129,
-    MldListenerQuery = 130,
-    MldListenerReport = 131,
-    NdRouterSolicit = 133,
-    NdRouterAdvert = 134,
-    NdNeighborSolicit = 135,
-    NdNeighborAdvert = 136,
-    WruRequest = 139,
-    WruReply = 140,
-    HaadRequest = 144,
-    HaadReply = 145,
-}
+static ICMP_TYPE_MAPPING: LazyLock<HashMap<u16, u16>> = LazyLock::new(||HashMap::from([
+    (ECHO_REQUEST, ECHO_REPLY),
+    (ECHO_REPLY, ECHO_REQUEST),
+    (MLD_LISTENER_QUERY, MLD_LISTENER_REPORT),
+    (MLD_LISTENER_REPORT, MLD_LISTENER_QUERY),
+    (ND_ROUTER_SOLICIT, ND_ROUTER_ADVERT),
+    (ND_ROUTER_ADVERT, ND_ROUTER_SOLICIT),
+    (ND_NEIGHBOR_SOLICIT, ND_NEIGHBOR_ADVERT),
+    (ND_NEIGHBOR_ADVERT, ND_NEIGHBOR_SOLICIT),
+    (WRU_REQUEST, WRU_REPLY),
+    (WRU_REPLY, WRU_REQUEST),
+    (HAAD_REQUEST, HAAD_REPLY),
+    (HAAD_REPLY, HAAD_REQUEST),
+]));
 
 pub(crate) fn get_port_equivalents(mtype: u16, mcode: u16) -> (u16, u16, bool) {
-    match IcmpType::try_from(mtype) {
-        Ok(mtype_obj) => match ICMP_TYPE_MAPPING.get(&mtype_obj) {
-            Some(v) => return (mtype, (*v).into(), false),
-            None => return (mtype, mcode, true),
-        },
-        Err(_) => return (mtype, mcode, true),
+    match ICMP_TYPE_MAPPING.get(&mtype) {
+        Some(v) => (mtype, *v, false),
+        None => (mtype, mcode, true),
     }
 }
