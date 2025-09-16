@@ -89,7 +89,7 @@ mod tests {
         assert!(id.is_err());
         assert_eq!(
             "src port and dst port should be set when protocol is tcp/udp/sctp",
-            id.err().unwrap().to_string()
+            id.err().unwrap()
         );
     }
 }
