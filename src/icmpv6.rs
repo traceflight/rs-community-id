@@ -14,21 +14,25 @@ const WRU_REPLY: u16 = 140;
 const HAAD_REQUEST: u16 = 144;
 const HAAD_REPLY: u16 = 145;
 
-// https://github.com/corelight/pycommunityid/blob/master/communityid/icmp6.py
-static ICMP_TYPE_MAPPING: LazyLock<HashMap<u16, u16>> = LazyLock::new(||HashMap::from([
-    (ECHO_REQUEST, ECHO_REPLY),
-    (ECHO_REPLY, ECHO_REQUEST),
-    (MLD_LISTENER_QUERY, MLD_LISTENER_REPORT),
-    (MLD_LISTENER_REPORT, MLD_LISTENER_QUERY),
-    (ND_ROUTER_SOLICIT, ND_ROUTER_ADVERT),
-    (ND_ROUTER_ADVERT, ND_ROUTER_SOLICIT),
-    (ND_NEIGHBOR_SOLICIT, ND_NEIGHBOR_ADVERT),
-    (ND_NEIGHBOR_ADVERT, ND_NEIGHBOR_SOLICIT),
-    (WRU_REQUEST, WRU_REPLY),
-    (WRU_REPLY, WRU_REQUEST),
-    (HAAD_REQUEST, HAAD_REPLY),
-    (HAAD_REPLY, HAAD_REQUEST),
-]));
+/// icmp type mapping
+///
+/// ref <https://github.com/corelight/pycommunityid/blob/master/communityid/icmp6.py>
+static ICMP_TYPE_MAPPING: LazyLock<HashMap<u16, u16>> = LazyLock::new(|| {
+    HashMap::from([
+        (ECHO_REQUEST, ECHO_REPLY),
+        (ECHO_REPLY, ECHO_REQUEST),
+        (MLD_LISTENER_QUERY, MLD_LISTENER_REPORT),
+        (MLD_LISTENER_REPORT, MLD_LISTENER_QUERY),
+        (ND_ROUTER_SOLICIT, ND_ROUTER_ADVERT),
+        (ND_ROUTER_ADVERT, ND_ROUTER_SOLICIT),
+        (ND_NEIGHBOR_SOLICIT, ND_NEIGHBOR_ADVERT),
+        (ND_NEIGHBOR_ADVERT, ND_NEIGHBOR_SOLICIT),
+        (WRU_REQUEST, WRU_REPLY),
+        (WRU_REPLY, WRU_REQUEST),
+        (HAAD_REQUEST, HAAD_REPLY),
+        (HAAD_REPLY, HAAD_REQUEST),
+    ])
+});
 
 pub(crate) fn get_port_equivalents(mtype: u16, mcode: u16) -> (u16, u16, bool) {
     match ICMP_TYPE_MAPPING.get(&mtype) {

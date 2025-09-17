@@ -24,9 +24,7 @@ pub fn calculate_community_id(
     match ip_proto {
         IPPROTO_TCP | IPPROTO_UDP | IPPROTO_SCTP => {
             if src_port.is_none() || dst_port.is_none() {
-                return Err(
-                    "src port and dst port should be set when protocol is tcp/udp/sctp"
-                );
+                return Err("src port and dst port should be set when protocol is tcp/udp/sctp");
             }
         }
         _ => {}
