@@ -1,5 +1,8 @@
 # rs-community-id
 
+[![Crates.io](https://img.shields.io/crates/v/community-id.svg)](https://crates.io/crates/community-id)
+[![rustdoc](https://img.shields.io/badge/Doc-community_id-green.svg)](https://docs.rs/community-id/)
+
 This package provides a Rust implementation of the open [Community ID](https://github.com/corelight/community-id-spec) flow hashing standard.
 
 ## Community ID
